@@ -1,13 +1,15 @@
 import express from "express";
+import morgan from "morgan";
 
 const PORT = 4000;
 const app = express();
-
-
+const logger = morgan("dev");
+/*
 const logger = (req, res, next) => {
     console.log(`${req.method} ${req.url}`);
     next();
 }
+*/
 /*
 const privateMiddleware = (req, res, next) => {
     const url = req.url;
@@ -30,8 +32,9 @@ const handleProtected = (req, res) => {
 }
 */
 
-app.use(logger);
+//app.use(logger);
 //app.use(privateMiddleware);
+app.use(logger);
 app.get("/", handleHome);
 //app.get("/protected",handleProtected);
 //app.get("/login", handleLogin)
