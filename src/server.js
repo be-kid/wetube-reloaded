@@ -1,3 +1,4 @@
+import "./db";
 import express from "express";
 import morgan from "morgan";
 import globalRouter from "./routers/globalRouter";
@@ -11,6 +12,8 @@ const logger = morgan("dev");
 app.set("view engine", "pug");
 app.set("views", process.cwd() + "/src/views");
 app.use(logger);
+app.use(express.urlencoded({extended: true}));
+//form을 이해하기 위한 method
 
 app.use("/", globalRouter);
 app.use("/videos", videoRouter);
@@ -18,5 +21,5 @@ app.use("/users",userRouter);
 
 
 const handleListening = () => 
-    console.log(`Server listenting on port ${PORT}`);
+    console.log(`Server listenting on port http://localhost:${PORT}`);
 app.listen(PORT, handleListening);
