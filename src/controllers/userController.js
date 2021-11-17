@@ -141,5 +141,51 @@ export const logout = (req, res) =>{
     return res.redirect("/");
 };
 
-export const edit = (req, res) => res.send("Edit User");
+export const getEdit = (req, res) => {
+    return res.render("edit-profile", { pageTitle: "Edit Profile"});
+};
+
+export const postEdit = async (req, res) => {
+    const {
+        session: {
+            user: {_id},
+        },
+        body: {name, email, username, location},
+    } = req;
+    //email, username을 변경했다면 중복 검사 필요
+    //변경했는지 체크 -> 변경했다면 중복체크
+    const pageTitle = "Edit Profile";
+    if (req.session.user.email !== email){
+        const emailExistCheck = await User.findOne({email: email});
+        if (emailExistCheck){
+            return res.status(400).render("edit-profile", {
+                pageTitle,
+                errorMessage: "This email already exists.",
+            }); 
+        }
+    }
+    if (req.session.user.username !== username){
+        const usernameExistCheck = await User.findOne({username: username});
+        if (usernameExistCheck){
+            return res.status(400).render("edit-profile", {
+                pageTitle,
+                errorMessage: "This username already exists.",
+            }); 
+        }
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+        _id, 
+        {
+            name,
+            email,
+            username,
+            location,
+        },
+        {new:true}
+    );
+    req.session.user = updatedUser;
+    return res.redirect("/users/edit");
+};
+
 export const see = (req, res) => res.send("See User");
