@@ -148,9 +148,10 @@ export const getEdit = (req, res) => {
 export const postEdit = async (req, res) => {
     const {
         session: {
-            user: {_id},
+            user: {_id, avatarUrl},
         },
         body: {name, email, username, location},
+        file,
     } = req;
     //email, username을 변경했다면 중복 검사 필요
     //변경했는지 체크 -> 변경했다면 중복체크
@@ -177,6 +178,7 @@ export const postEdit = async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(
         _id, 
         {
+            avatarUrl: file ? file.path: avatarUrl,
             name,
             email,
             username,
@@ -186,6 +188,39 @@ export const postEdit = async (req, res) => {
     );
     req.session.user = updatedUser;
     return res.redirect("/users/edit");
+};
+
+export const getChangePassword = (req, res) => {
+    if (req.session.user.socialOnly === true){
+        return res.redirect("/");
+    }
+    return res.render("users/change-password", { pageTitle: "Change Password"});
+};
+
+export const postChangePassword = async (req, res) => {
+    const {
+        session: {
+            user: {_id},
+        },
+        body: {oldPassword, newPassword, newPasswordConfirmation},
+    } = req;
+    const user = await User.findById(_id);
+    const ok = await bcrypt.compare(oldPassword, user.password);
+    if (!ok) {
+        return res.status(400).render("users/change-password", {
+            pageTitle: "Change Password",
+            errorMessage: "The current password is incorrect",
+        });
+    }
+    if (newPassword !== newPasswordConfirmation){
+        return res.status(400).render("users/change-password", {
+            pageTitle: "Change Password",
+            errorMessage: "The password does not match the confirmation",
+        });
+    }
+    user.password = newPassword;
+    await user.save();
+    return res.redirect("/users/logout");
 };
 
 export const see = (req, res) => res.send("See User");
