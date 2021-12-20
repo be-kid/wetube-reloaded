@@ -17,6 +17,8 @@ app.set("views", process.cwd() + "/src/views");
 app.use(logger);
 app.use(express.urlencoded({extended: true}));
 //form을 이해하기 위한 method
+app.use(express.json());
+//express가 데이터를 json 형태로 주고 받을 수 있도록 도와줌
 
 app.use(
     session({
