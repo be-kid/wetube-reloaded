@@ -7,7 +7,11 @@
     "url": "git+https://github.com/daramzy/wetube-reloaded.git"
   },
   "scripts": {
-    "dev:assets": "webpack",
+    "start": "node build/init.js",
+    "build": "npm run build:server && npm run build:assets",
+    "build:assets": "webpack --mode=production",
+    "build:server": "babel src -d build",
+    "dev:assets": "webpack --mode=development -w",
     "dev:server": "nodemon"
   },
   "author": "daramzy",
@@ -31,7 +35,8 @@
     "regenerator-runtime": "^0.13.9"
   },
   "devDependencies": {
-    "@babel/core": "^7.15.0",
+    "@babel/cli": "^7.16.0",
+    "@babel/core": "^7.16.5",
     "@babel/node": "^7.14.9",
     "@babel/preset-env": "^7.15.0",
     "babel-loader": "^8.2.3",
